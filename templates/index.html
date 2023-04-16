@@ -1,21 +1,44 @@
 <!DOCTYPE html>
+<html>
 <head>
-  <title>OpenAI Quickstart</title>
-  <link
-    rel="shortcut icon"
-    href="{{ url_for('static', filename='dog.png') }}"
-  />
+  <title>MindMate</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
 </head>
 
 <body>
-  <img src="{{ url_for('static', filename='dog.png') }}" class="icon" />
-  <h3>Name my pet</h3>
-  <form action="/" method="post">
-    <input type="text" name="animal" placeholder="Enter an animal" required />
-    <input type="submit" value="Generate names" />
-  </form>
+  <div class="wrapper">
+    <h3 class="chat-bubble-header">Talk to MindMate</h3>
+    <div class="conversation-box" id="conversation-box">
+      {% for message in conversation %}
+        <div class="line {% if message.get('speaker') == 'You' %}right{% else %}left{% endif %}">
+          <span class="speaker">{{ message['speaker'] }}:</span> {{ message['message'] }}
+        </div>
+      {% endfor %}
+    </div>
+    <div class="form-container">
+      <form action="/" method="POST">
+        <input type="text" name="question" placeholder="Is there anything you'd like to discuss?" required />
+        <input type="submit" value="Submit" />
+        <input type="hidden" name="conversation" value="{{ conversation_json }}" />
+      </form>
+      <button type="button" onclick="clearConversation()">Clear conversation history</button>
+    </div>
+  </div>
   {% if result %}
-  <div class="result">{{ result }}</div>
+    <div class="result-box">
+      <div class="result">{{ result|safe }}</div>
+    </div>
   {% endif %}
+  <script>
+    function clearConversation() {
+      if (confirm("Are you sure you want to clear the conversation history?")) {
+        document.querySelector("[name='conversation']").value = "[]";
+        const conversationBox = document.getElementById("conversation-box");
+        while (conversationBox.firstChild) {
+          conversationBox.removeChild(conversationBox.firstChild);
+        }
+      }
+    }
+  </script>
 </body>
+</html>
